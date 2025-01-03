@@ -3,7 +3,6 @@ import qrcode
 from io import BytesIO
 from PIL import Image
 from collections import defaultdict
-from streamlit.runtime.scriptrunner import RerunException, RerunData
 
 # Configurer la page
 st.set_page_config(page_title="Vote : Concours de la plus belle crèche Noël 2024", page_icon="🌟", layout="centered")
@@ -90,19 +89,20 @@ if admin_password == "Beaumont@2024":
     st.sidebar.subheader("Options d'administration")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🔄 Rafraîchir la page"):
-            raise RerunException(RerunData(None))  # Forcer le redémarrage
+        if st.button("🔄 Rafraîchir la page (Admin)"):
+            st.experimental_rerun()
     with col2:
         if st.button("🗑️ Réinitialiser les votes"):
             reinitialiser_votes()
             st.success("Les votes ont été réinitialisés.")
-            raise RerunException(RerunData(None))
+            st.experimental_rerun()
 
     # Administrateur peut voter plusieurs fois
     if vote_choice != "Choisissez une option":
         if st.button("Valider mon vote (Admin) ✅"):
             st.session_state.votes[category_choice][vote_choice] += 1
             st.success(f"Vote enregistré pour la {vote_choice} dans la {category_choice} (par Admin) !")
+            st.experimental_rerun()
 
 # Vérification avant d'enregistrer un vote (utilisateur classique)
 elif vote_choice != "Choisissez une option":
@@ -113,6 +113,7 @@ elif vote_choice != "Choisissez une option":
             st.session_state.votes[category_choice][vote_choice] += 1
             st.session_state.votes_cast_categories.add(category_choice)
             st.success(f"Merci pour votre vote pour la {vote_choice} dans la {category_choice} !")
+            st.experimental_rerun()
 
 # Résultats dynamiques réservés à l'administrateur
 if admin_password == "Beaumont@2024":
