@@ -15,8 +15,8 @@ if 'votes' not in st.session_state:
         "Catégorie Paroisse": defaultdict(int)
     }
 
-if 'votes_cast' not in st.session_state:
-    st.session_state.votes_cast = set()  # Stocker les choix de vote
+if 'votes_cast_categories' not in st.session_state:
+    st.session_state.votes_cast_categories = set()  # Stocker les catégories où l'utilisateur a déjà voté
 
 # Fonction pour générer un QR Code
 def generer_qr_code(data):
@@ -37,7 +37,7 @@ def reinitialiser_votes():
         "Catégorie Famille": defaultdict(int),
         "Catégorie Paroisse": defaultdict(int)
     }
-    st.session_state.votes_cast = set()
+    st.session_state.votes_cast_categories = set()
 
 # Titre de l'application
 st.title("Concours de la plus belle crèche Noël 2024 🎄")
@@ -81,17 +81,10 @@ vote_choice = st.radio(
     [f"{i}. {option}" if option != "Choisissez une option" else option for i, option in enumerate(categories[category_choice], start=1)]
 )
 
-# Vérification avant d'enregistrer un vote
-if vote_choice == "Choisissez une option":
-    st.warning("Veuillez sélectionner une crèche avant de valider votre vote.")
-else:
-    if st.button("Valider mon vote ✅"):
-        st.session_state.votes[category_choice][vote_choice] += 1
-        st.success(f"Merci pour votre vote pour la {vote_choice} dans la {category_choice} !")
-
 # Partie administrateur uniquement avec code correct
 st.sidebar.title("Mode Administrateur")
 admin_password = st.sidebar.text_input("Entrez le code administrateur :", type="password")
+
 if admin_password == "Beaumont@2024":
     st.sidebar.success("Accès administrateur accordé")
     st.sidebar.subheader("Options d'administration")
@@ -104,6 +97,22 @@ if admin_password == "Beaumont@2024":
             reinitialiser_votes()
             st.success("Les votes ont été réinitialisés.")
             raise RerunException(RerunData(None))
+
+    # Administrateur peut voter plusieurs fois
+    if vote_choice != "Choisissez une option":
+        if st.button("Valider mon vote (Admin) ✅"):
+            st.session_state.votes[category_choice][vote_choice] += 1
+            st.success(f"Vote enregistré pour la {vote_choice} dans la {category_choice} (par Admin) !")
+
+# Vérification avant d'enregistrer un vote (utilisateur classique)
+elif vote_choice != "Choisissez une option":
+    if category_choice in st.session_state.votes_cast_categories:
+        st.warning(f"Vous avez déjà voté pour une crèche dans la catégorie '{category_choice}'.")
+    else:
+        if st.button("Valider mon vote ✅"):
+            st.session_state.votes[category_choice][vote_choice] += 1
+            st.session_state.votes_cast_categories.add(category_choice)
+            st.success(f"Merci pour votre vote pour la {vote_choice} dans la {category_choice} !")
 
 # Résultats dynamiques réservés à l'administrateur
 if admin_password == "Beaumont@2024":
