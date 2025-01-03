@@ -45,7 +45,7 @@ st.markdown("**Votez pour votre crèche préférée parmi les catégories ci-des
 
 # Ajouter un QR Code pour partager l'application
 st.subheader("Partagez cette application")
-qr_data = "https://<votre-lien-streamlit>"  # Remplacez par le lien Streamlit après déploiement
+qr_data = "https://votescreches2024-nxjtyxkx2hhdkmod87bgyz.streamlit.app/"  # Remplacez par le lien Streamlit après déploiement
 img = generer_qr_code(qr_data)
 buffer = BytesIO()
 img.save(buffer, format="PNG")
