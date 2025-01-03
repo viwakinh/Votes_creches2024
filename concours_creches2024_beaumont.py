@@ -90,19 +90,19 @@ if admin_password == "Beaumont@2024":
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🔄 Rafraîchir la page (Admin)"):
-            st.experimental_rerun()
+            st.session_state["refresh_key"] = not st.session_state.get("refresh_key", False)
     with col2:
         if st.button("🗑️ Réinitialiser les votes"):
             reinitialiser_votes()
             st.success("Les votes ont été réinitialisés.")
-            st.experimental_rerun()
+            st.session_state["refresh_key"] = not st.session_state.get("refresh_key", False)
 
     # Administrateur peut voter plusieurs fois
     if vote_choice != "Choisissez une option":
         if st.button("Valider mon vote (Admin) ✅"):
             st.session_state.votes[category_choice][vote_choice] += 1
             st.success(f"Vote enregistré pour la {vote_choice} dans la {category_choice} (par Admin) !")
-            st.experimental_rerun()
+            st.session_state["refresh_key"] = not st.session_state.get("refresh_key", False)
 
 # Vérification avant d'enregistrer un vote (utilisateur classique)
 elif vote_choice != "Choisissez une option":
@@ -113,7 +113,7 @@ elif vote_choice != "Choisissez une option":
             st.session_state.votes[category_choice][vote_choice] += 1
             st.session_state.votes_cast_categories.add(category_choice)
             st.success(f"Merci pour votre vote pour la {vote_choice} dans la {category_choice} !")
-            st.experimental_rerun()
+            st.session_state["refresh_key"] = not st.session_state.get("refresh_key", False)
 
 # Résultats dynamiques réservés à l'administrateur
 if admin_password == "Beaumont@2024":
